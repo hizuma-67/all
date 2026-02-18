@@ -1,1 +1,1 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/hizuma-67/all/refs/heads/main/fuckyou.obfuscated.lua.txt"))()
+loadstring(game:HttpGet("https://github.com/hizuma-67/all/blob/main/3_76_7.obfuscated-1.lua.txt"))()
