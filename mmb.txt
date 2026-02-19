@@ -4,6 +4,7 @@
     - Fix lỗi không hiện Menu.
     - Welcome xuất hiện SAU KHI Loading xong.
     - Thời gian Welcome lâu hơn, hiệu ứng mượt hơn (Đã nâng cấp bản Premium Max).
+    - FIX: AFK Background Full Screen (Che phủ toàn bộ màn hình).
 ]]
 
 -- BẮT BUỘC CHỜ GAME LOAD ĐỂ TRÁNH CRASH
@@ -39,16 +40,17 @@ local function GetSafeGui()
 end
 
 ----------------------------------------------------------------
--- HỆ THỐNG OVERLAY AFK (NẰM DƯỚI)
+-- HỆ THỐNG OVERLAY AFK (SỬA LẠI ĐỂ FULL MÀN HÌNH)
 ----------------------------------------------------------------
 local AFKGui = Instance.new("ScreenGui")
 AFKGui.Name = "67_AFK_System"
-AFKGui.IgnoreGuiInset = true
-AFKGui.DisplayOrder = 5 
+AFKGui.IgnoreGuiInset = true -- Bỏ qua khoảng trống thanh công cụ Roblox
+AFKGui.DisplayOrder = 999999 -- Đẩy lên trên cùng của tất cả các GUI khác
 AFKGui.Parent = GetSafeGui()
 
 local AFKFrame = Instance.new("Frame")
 AFKFrame.Size = UDim2.new(1, 0, 1, 0)
+AFKFrame.Position = UDim2.new(0, 0, 0, 0)
 AFKFrame.Visible = false
 AFKFrame.BorderSizePixel = 0
 AFKFrame.ZIndex = 1
@@ -103,7 +105,6 @@ local function RunLoadingSystem()
     TitleLoad.Font = Enum.Font.GothamBold
     TitleLoad.BackgroundTransparency = 1
     
-    -- Hiệu ứng màu mè cho Loading
     task.spawn(function()
         while LoadingGui.Parent do
             local t = tick()
@@ -131,7 +132,6 @@ local function RunLoadingSystem()
     StatusText.Font = Enum.Font.GothamMedium
     StatusText.BackgroundTransparency = 1
 
-    -- Chạy Loading
     local steps = {
         {0.20, "🛡️ Checking Security Protocol..."},
         {0.40, "⚙️ Loading System Assets..."},
@@ -143,48 +143,44 @@ local function RunLoadingSystem()
     for _, s in ipairs(steps) do
         TweenService:Create(BarFill, TweenInfo.new(0.8, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(s[1], 0, 1, 0)}):Play()
         StatusText.Text = s[2]
-        task.wait(0.8) -- Thời gian mỗi bước
+        task.wait(0.8)
     end
     
-    PlaySound("140385303603086") -- Âm thanh xong Loading
+    PlaySound("140385303603086")
     task.wait(0.5)
     LoadingGui:Destroy()
 end
 
 ----------------------------------------------------------------
--- 2. HỆ THỐNG WELCOME PREMIUM (ĐÃ NÂNG CẤP XỊN SÒ HƠN)
+-- 2. HỆ THỐNG WELCOME PREMIUM
 ----------------------------------------------------------------
 local function RunWelcomeSystem()
     local WelcomeGui = Instance.new("ScreenGui", GetSafeGui())
     WelcomeGui.Name = "67_Welcome_Pro_Max"
+    WelcomeGui.IgnoreGuiInset = true -- Đảm bảo nền làm mờ full màn hình
     WelcomeGui.DisplayOrder = 10005
 
-    -- Lấy Avatar
     local content, isReady = Players:GetUserThumbnailAsync(Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
 
-    -- Nền làm mờ nhẹ (Cinematic Effect)
     local BgDim = Instance.new("Frame", WelcomeGui)
-    BgDim.Size = UDim2.new(2, 0, 1, 0)
+    BgDim.Size = UDim2.new(1, 0, 1, 0)
     BgDim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     BgDim.BackgroundTransparency = 1 
     BgDim.BorderSizePixel = 0
 
-    -- Khung chứa
     local Holder = Instance.new("Frame", WelcomeGui)
     Holder.Size = UDim2.new(0, 400, 0, 200)
     Holder.Position = UDim2.new(0.5, -200, 0.4, -50)
     Holder.BackgroundTransparency = 1
 
-    -- Hào quang xoay quanh Avatar (Aura Glow)
     local Aura = Instance.new("ImageLabel", Holder)
     Aura.Size = UDim2.new(0, 180, 0, 180)
     Aura.Position = UDim2.new(0.5, -90, 0, -35)
-    Aura.Image = "rbxassetid://1316045217" -- Hiệu ứng vòng sáng
+    Aura.Image = "rbxassetid://1316045217"
     Aura.BackgroundTransparency = 1
     Aura.ImageColor3 = Color3.fromRGB(0, 255, 255)
     Aura.ImageTransparency = 1
 
-    -- Avatar Tròn (Phóng to từ giữa tâm)
     local Avatar = Instance.new("ImageLabel", Holder)
     Avatar.Size = UDim2.new(0, 0, 0, 0)
     Avatar.Position = UDim2.new(0.5, 0, 0, 55)
@@ -201,7 +197,6 @@ local function RunWelcomeSystem()
     AVStroke.Color = Color3.fromRGB(0, 255, 255)
     AVStroke.Transparency = 1
 
-    -- Chữ Welcome
     local WelcomeLbl = Instance.new("TextLabel", Holder)
     WelcomeLbl.Size = UDim2.new(1, 0, 0, 30)
     WelcomeLbl.Position = UDim2.new(0, 0, 0.8, 0)
@@ -212,7 +207,6 @@ local function RunWelcomeSystem()
     WelcomeLbl.BackgroundTransparency = 1
     WelcomeLbl.TextTransparency = 1
 
-    -- Tên người chơi
     local NameLbl = Instance.new("TextLabel", Holder)
     NameLbl.Size = UDim2.new(1, 0, 0, 40)
     NameLbl.Position = UDim2.new(0, 0, 0.95, 0)
@@ -223,20 +217,16 @@ local function RunWelcomeSystem()
     NameLbl.BackgroundTransparency = 1
     NameLbl.TextTransparency = 1
 
-    -- Âm thanh Welcome sang trọng
     PlaySound("6895079853")
 
-    -- HIỆU ỨNG XUẤT HIỆN
     TweenService:Create(BgDim, TweenInfo.new(1), {BackgroundTransparency = 0.5}):Play()
     
     local twIn = TweenInfo.new(1.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
     
-    -- 1. Hiện Avatar & Aura
     TweenService:Create(Aura, TweenInfo.new(1.5), {ImageTransparency = 0.3}):Play()
     TweenService:Create(Avatar, twIn, {ImageTransparency = 0, Size = UDim2.new(0, 120, 0, 120)}):Play()
     TweenService:Create(AVStroke, twIn, {Transparency = 0}):Play()
     
-    -- Vòng lặp xoay Aura và đổi màu RGB
     local runGlow = true
     task.spawn(function()
         while runGlow and WelcomeGui.Parent do
@@ -251,16 +241,13 @@ local function RunWelcomeSystem()
 
     task.wait(0.4)
     
-    -- 2. Hiện chữ (Hiệu ứng trượt mượt lên)
     local twText = TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
     TweenService:Create(WelcomeLbl, twText, {TextTransparency = 0, Position = UDim2.new(0, 0, 0.65, 0)}):Play()
     task.wait(0.2)
     TweenService:Create(NameLbl, twText, {TextTransparency = 0, Position = UDim2.new(0, 0, 0.8, 0)}):Play()
 
-    -- 3. GIỮ LẠI LÂU HƠN (4.5 GIÂY)
     task.wait(4.5) 
 
-    -- 4. BIẾN MẤT
     runGlow = false
     local twOut = TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
     TweenService:Create(BgDim, twOut, {BackgroundTransparency = 1}):Play()
@@ -275,13 +262,13 @@ local function RunWelcomeSystem()
 end
 
 ----------------------------------------------------------------
--- CHẠY TRÌNH TỰ (ĐẢM BẢO KHÔNG LỖI)
+-- CHẠY TRÌNH TỰ
 ----------------------------------------------------------------
-RunLoadingSystem() -- 1. Chạy Loading trước, chờ xong mới đi tiếp
-RunWelcomeSystem() -- 2. Loading xong thì chạy Welcome, chờ xong mới đi tiếp
+RunLoadingSystem()
+RunWelcomeSystem()
 
 ----------------------------------------------------------------
--- 3. LOGIC HỆ THỐNG & RAYFIELD (MENU CHÍNH)
+-- 3. LOGIC HỆ THỐNG & RAYFIELD
 ----------------------------------------------------------------
 local MarketplaceService = game:GetService("MarketplaceService")
 local VirtualUser = game:GetService("VirtualUser")
@@ -323,9 +310,6 @@ task.spawn(function()
     end)
 end)
 
-----------------------------------------------------------------
--- KHỞI TẠO RAYFIELD
-----------------------------------------------------------------
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
@@ -345,7 +329,7 @@ local Window = Rayfield:CreateWindow({
    }
 })
 
-PlaySound("117084877592917") -- Âm thanh hiện Menu
+PlaySound("117084877592917")
 
 local function Notify(title, content)
     Rayfield:Notify({ Title = title, Content = content, Duration = 4, Image = 4483362458 })
@@ -460,6 +444,7 @@ if isTSB then
         Notify("Side Dash assist V3", "Hoàn thành load script!")
     end })
 end
+
 -- TAB TIỆN ÍCH
 if not isJJS and not isTSB then
     local TabUtility = Window:CreateTab("Scprit", 11570895459)
@@ -471,6 +456,7 @@ if not isJJS and not isTSB then
         Notify("Infinite Yield", "Hoàn thành load script!")
     end })
 end
+
 -- [TAB NGƯỜI CHƠI]
 local TabPlayer = Window:CreateTab("Người Chơi", 8797391485)
 TabPlayer:CreateSection("📌 Tùy chỉnh nhân vật")
@@ -483,6 +469,7 @@ TabPlayer:CreateSlider({
        if Player.Character and Player.Character:FindFirstChild("Humanoid") then Player.Character.Humanoid.WalkSpeed = Value end
    end,
 })
+
 -- TAB CÀI ĐẶT
 local TabSettings = Window:CreateTab("Cài đặt", 11956055886)
 TabSettings:CreateSection("📌 Tùy chỉnh hệ thống")
@@ -519,6 +506,7 @@ TabSettings:CreateToggle({
 })
 TabSettings:CreateSection("📌 Quản lý Menu")
 TabSettings:CreateButton({ Name = "❌ Đóng Menu Script", Callback = function() Rayfield:Destroy() end })
+
 -- TAB THÔNG TIN
 local TabAbout = Window:CreateTab("Thông tin", 4871684504)
 TabAbout:CreateSection("📌 Thông tin chi tiết")
@@ -547,5 +535,4 @@ Player.Idled:Connect(function()
         VirtualUser:CaptureController()
         VirtualUser:ClickButton2(Vector2.new())
     end
-
 end)
